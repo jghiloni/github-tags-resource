@@ -17,7 +17,9 @@ params:
   CONTEXT: source
   IMAGE_ARG_build_image: base-image-build/image.tar
   IMAGE_ARG_run_image: base-image-run/image.tar
-
+  BUILD_ARG_version: ""
+  BUILD_ARG_build_ref: ""
+  
 run:
   path: build
 

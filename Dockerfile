@@ -1,5 +1,7 @@
 ARG build_image
 ARG run_image
+ARG version
+ARG build_ref
 FROM ${build_image} AS build
 
 ENV GOOS=linux
@@ -12,7 +14,7 @@ COPY . .
 
 RUN ["go", "mod", "download"]
 RUN ["go", "build", "-trimpath", "-o", "/usr/bin/github-tags-resource", "-ldflags",\
-    "-w -s -X main.Version=$(cat ./version/version) -X main.BuildRef=$(cat ./.git/short_ref)", "."]
+    '"-w -s -X main.Version=${version} -X main.BuildRef=${build_ref}"', "."]
 
 RUN ["/usr/bin/github-tags-resource", "-v"]
 

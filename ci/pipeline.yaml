@@ -68,10 +68,19 @@ jobs:
           - put: image-version
             params:
               bump: patch
+      - load_var: version
+        file: image-version/version
+        format: raw
+      - load_var: build_ref
+        file: source/.git/ref
+        format: raw
       - task: build-oci-image
         file: source/ci/build-image-task.yaml
         image: build-task
         privileged: true
+        params:
+          BUILD_ARG_version: ((.:version))
+          BUILD_ARG_build_ref: ((.:build_ref))
       - put: target-registry
         params:
           image: image/image.tar
