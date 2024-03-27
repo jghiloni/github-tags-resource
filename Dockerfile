@@ -13,8 +13,7 @@ WORKDIR /build
 COPY . .
 
 RUN ["go", "mod", "download"]
-RUN ["go", "build", "-trimpath", "-o", "/usr/bin/github-tags-resource", "-ldflags",\
-    '"-w -s -X main.Version=${version} -X main.BuildRef=${build_ref}"', "."]
+RUN ["go", "build", "-trimpath", "-o", "/usr/bin/github-tags-resource", "-ldflags", "-w -s -X main.Version=${version} -X main.BuildRef=${build_ref}", "."]
 
 RUN ["/usr/bin/github-tags-resource", "-v"]
 
