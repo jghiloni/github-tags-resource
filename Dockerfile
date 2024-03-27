@@ -10,11 +10,11 @@ WORKDIR /build
 
 COPY . .
 
-RUN go mod download
-RUN go build -trimpath -o /usr/bin/github-tags-resource -ldflags \
-    "-w -s -X main.Version=$(cat ./version/version) -X main.BuildRef=$(cat ./.git/short_ref)" .
+RUN ["go", "mod", "download"]
+RUN ["go", "build", "-trimpath", "-o", "/usr/bin/github-tags-resource", "-ldflags",\
+    "-w -s -X main.Version=$(cat ./version/version) -X main.BuildRef=$(cat ./.git/short_ref)", "."]
 
-RUN /usr/bin/github-tags-resource -v
+RUN ["/usr/bin/github-tags-resource", "-v"]
 
 FROM ${run_image} AS run
 
@@ -23,4 +23,4 @@ USER root
 WORKDIR /opt/resource
 
 COPY --from=build /usr/bin/github-tags-resource /usr/bin/github-tags-resource
-RUN /usr/bin/github-tags-resource install
+RUN ["/usr/bin/github-tags-resource", "install"]
