@@ -1,4 +1,5 @@
 ARG build_image
+ARG run_image
 FROM ${build_image} AS build
 
 ENV GOOS=linux
@@ -15,8 +16,7 @@ RUN go build -trimpath -o /usr/bin/github-tags-resource -ldflags \
 
 RUN /usr/bin/github-tags-resource -v
 
-ARG run_image
-FROM ${run_image}
+FROM ${run_image} AS run
 
 USER root
 

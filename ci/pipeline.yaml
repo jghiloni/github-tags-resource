@@ -58,8 +58,12 @@ jobs:
             trigger: true
           - get: base-image-build
             trigger: true
+            params:
+              format: oci
           - get: base-image-run
             trigger: true
+            params:
+              format: oci
           - get: build-task
           - put: image-version
             params:
