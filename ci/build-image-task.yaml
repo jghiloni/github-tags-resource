@@ -1,0 +1,23 @@
+platform: linux
+
+inputs:
+  - name: source
+  - name: image-version
+    path: source/version
+  - name: base-image-run
+  - name: base-image-build
+
+outputs:
+  - name: image
+
+caches:
+  - path: cache
+
+params:
+  CONTEXT: source
+  IMAGE_ARG_build_image: base-image-build/image.tar
+  IMAGE_ARG_run_image: base-image-run/image.tar
+
+run:
+  path: build
+

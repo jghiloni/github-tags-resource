@@ -1,0 +1,76 @@
+resources:
+  - name: source
+    icon: github
+    type: git
+    source:
+      uri: git@github.com:jghiloni/github-tags-resource.git
+      private_key: ((github-tags-resource-deploy-key))
+
+  - name: base-image-build
+    icon: docker
+    type: registry-image
+    check_every: 24h
+    source:
+      repository: chainguard/go
+      tag: latest
+
+  - name: base-image-run
+    icon: docker
+    type: registry-image
+    check_every: 24h
+    source:
+      repository: chainguard/glibc-dynamic
+      tag: latest
+
+  - name: build-task
+    icon: docker
+    type: registry-image
+    check_every: 372h
+    source:
+      repository: concourse/oci-build-task
+      tag: "0.11"
+
+  - name: target-registry
+    icon: docker
+    type: registry-image
+    source:
+      repository: harbor.ops.verysmart.house/library/github-tags-resource-type
+      username: ((harbor-robot.username))
+      password: ((harbor-robot.password))
+
+  - name: image-version
+    icon: database
+    type: semver
+    source:
+      initial_version: "0.0.0"
+      bucket: versions
+      key: github-tags-resource-type
+      access_key_id: ((minio.access-key-id))
+      secret_access_key: ((minio.secret-access-key))
+      region_name: us-east-1
+      endpoint: ((minio.url))
+
+jobs:
+  - name: build-image
+    plan:
+      - in_parallel:
+          - get: source
+            trigger: true
+          - get: base-image-build
+            trigger: true
+          - get: base-image-run
+            trigger: true
+          - get: build-task
+          - put: image-version
+            params:
+              bump: patch
+      - task: build-oci-image
+        file: source/ci/build-image-task.yaml
+        image: build-task
+        privileged: true
+      - put: target-registry
+        params:
+          image: image/image.tar
+          additional_tags: image-version/version
+        get_params:
+          skip_download: true
